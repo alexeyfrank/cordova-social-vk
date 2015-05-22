@@ -55,7 +55,7 @@ public class SocialVk extends CordovaPlugin {
   private Activity getActivity() {
     return (Activity)this.webView.getContext();
   }
-	
+
   @Override
   public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
     this._callbackContext = callbackContext;
@@ -82,20 +82,20 @@ public class SocialVk extends CordovaPlugin {
           _callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
           _callbackContext.error("Error");
         }
-        
+
         @Override
         public void onCaptchaError(VKError captchaError) {
           new VKCaptchaDialog(captchaError).show();
           fail();
         }
-        
+
         @Override
         public void onTokenExpired(VKAccessToken expiredToken) {
           //VKSdk.authorize(scope);
           Log.w(TAG, "VK token expired");
           success();
         }
-                    
+
         @Override
         public void onAccessDenied(VKError authorizationError) {
           new AlertDialog.Builder(webView.getContext())
@@ -104,7 +104,7 @@ public class SocialVk extends CordovaPlugin {
           Log.w(TAG, "VK Access denied!");
           fail();
         }
-                            
+
         @Override
         public void onReceiveNewToken(VKAccessToken newToken) {
           Log.i(TAG, "VK new token: "+newToken.accessToken);
@@ -112,7 +112,7 @@ public class SocialVk extends CordovaPlugin {
           success();
           share(savedUrl, savedComment, savedImageUrl);
         }
-            
+
         @Override
         public void onAcceptUserToken(VKAccessToken token) {
           Log.i(TAG, "VK accept token: "+token.accessToken);
@@ -120,7 +120,7 @@ public class SocialVk extends CordovaPlugin {
           share(savedUrl, savedComment, savedImageUrl);
         }
       };
-        
+
     Log.i(TAG, "VK initialize");
     VKSdk.initialize(sdkListener, appId, VKAccessToken.tokenFromSharedPreferences(webView.getContext(), sTokenKey));
     VKUIHelper.onCreate(getActivity());
@@ -133,7 +133,7 @@ public class SocialVk extends CordovaPlugin {
   private boolean shareOrLogin(final String url, final String comment, final String imageUrl)
   {
     this.cordova.setActivityResultCallback(this);
-    final String[] scope = new String[]{VKScope.WALL, VKScope.PHOTOS};
+    final String[] scope = new String[]{VKScope.WALL, VKScope.OFFLINE, VKScope.FRIENDS, VKScope.GROUPS};
     if(!VKSdk.isLoggedIn()) {
       savedUrl = url;
       savedComment = comment;
@@ -148,7 +148,7 @@ public class SocialVk extends CordovaPlugin {
   private boolean share(final String url, final String comment, final String imageUrl)
   {
     if(url == null || comment == null) return false;
-    
+
     new AsyncTask<String, Void, String>() {
       private Bitmap image = null;
       @Override protected String doInBackground(String... args) {
@@ -190,7 +190,7 @@ public class SocialVk extends CordovaPlugin {
     if(resultCode != 0)
       VKUIHelper.onActivityResult(getActivity(), requestCode, resultCode, data);
   }
-  
+
   public static Bitmap getBitmapFromURL(String src) {
     try {
       URL url = new URL(src);

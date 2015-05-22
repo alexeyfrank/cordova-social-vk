@@ -16,21 +16,21 @@
 - (void) initSocialVk:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = nil;
-    
-    
+
+
     if(!inited) {
         NSString *appId = [[NSString alloc] initWithString:[command.arguments objectAtIndex:0]];
         [VKSdk initializeWithDelegate:self andAppId:appId];
         if(![VKSdk wakeUpSession]) {
             NSLog(@"VK init error!");
         }
-        
+
         NSLog(@"SocialVk Plugin initalized");
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(myOpenUrl:) name:CDVPluginHandleOpenURLNotification object:nil];
         inited = YES;
     }
-    
+
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -59,7 +59,7 @@
                 VKRequest *req = [VKRequest requestWithMethod:@"users.get" andParameters:@{@"fields": @"id, nickname, first_name, last_name, sex, bdate, timezone, photo, photo_big, city, country"} andHttpMethod:@"GET"];
                 [req executeWithResultBlock:^(VKResponse *response) {
                     NSLog(@"User response %@", response);
-                    
+
                     CDVPluginResult* pluginResult = nil;
                     loginDetails = [NSMutableDictionary new];
                     loginDetails[@"token"] = token;
@@ -106,7 +106,7 @@
 -(void) share:(CDVInvokedUrlCommand*)command {
     NSBundle *vkb = [VKBundle vkLibraryResourcesBundle];
     NSLog(@"VK Bundle path %@", vkb.bundlePath);
-    
+
     savedCommand = command;
     NSString *sourceURL = [command.arguments objectAtIndex:0];
     NSString* description = [command.arguments objectAtIndex:1];
@@ -148,7 +148,7 @@
 -(void)vkLoginWithBlock:(void (^)(NSString *))block
 {
     vkCallBackBlock = [block copy];
-    [VKSdk authorize:@[VK_PER_WALL, VK_PER_OFFLINE] revokeAccess:NO forceOAuth:YES inApp:YES display:VK_DISPLAY_IOS];
+    [VKSdk authorize:@[VK_PER_WALL, VK_PER_OFFLINE, VK_PER_GROUPS, VK_PER_FRIENDS] revokeAccess:NO forceOAuth:YES inApp:YES display:VK_DISPLAY_IOS];
 }
 
 -(void)logout:(CDVInvokedUrlCommand *)command
@@ -189,7 +189,7 @@
 
 -(void) vkSdkTokenHasExpired:(VKAccessToken *)expiredToken
 {
-    
+
 }
 
 -(void) vkSdkNeedCaptchaEnter:(VKError *)captchaError
